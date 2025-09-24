@@ -41,6 +41,9 @@ class Employee(models.Model) :
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
 
+    def __str__(self):
+        return self.name
+
 # Many To Many realation
 # task = onekgulo empoyee ekta task korse
 # employee = onekgulo task er jonn employee assign ase
