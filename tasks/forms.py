@@ -13,11 +13,43 @@ class TaskForm (forms.Form) :
         super().__init__(*args, **kwargs)
         self.fields['assigned_to'].choices = [(emp.id, emp.name) for emp in employees]
 
+class styledFormMixin :
+    """Mixin to apply Styled for Django Model Form"""
+    default_classes = "border border-gray-500 rounded-sm w-full resize-none  focus:outline-none focus:border-gray-200"
+
+    def apply_styled_widgets(self) :
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.TextInput):
+                field.widget.attrs.update({
+                    "class" : self.default_classes,
+                    "placeholder" : f"enter the task {field.label.lower()}"
+                })
+            elif isinstance(field.widget, forms.Textarea):
+                field.widget.attrs.update({
+                    "class" : self.default_classes,
+                    "placeholder" : f"enter the task {field.label.lower()}",
+                    "rows" : "5"
+                })
+            elif isinstance(field.widget, forms.SelectDateWidget):
+                field.widget.attrs.update({
+                    "class" : "border bg-gray-600 border-gray-500 rounded-sm resize:none focus:outline-none focus:border-gray-200"
+                })
+            elif isinstance(field.widget, forms.CheckboxSelectMultiple):
+                field.widget.attrs.update({
+                    "class" : "space-y-2"
+                })
+
 # Django Model Form
-class TaskModelForm (forms.ModelForm) :
+class TaskModelForm (styledFormMixin,forms.ModelForm) :
     class Meta :
         model = Task
-        # fields = ['title','description','due_date','is_completed','assigned_to']
-        # je je field gulo baad deye baki gulo form dekhate chai 
-        # tar jonno exclude method
-        exclude = ['project','is_completed','created_at','updated_at']
+        fields = ['title','description','due_date','assigned_to']
+        widgets = {
+            "due_date" : forms.SelectDateWidget,
+            "assigned_to" : forms.CheckboxSelectMultiple
+        }
+
+    """Widgets using Mixins"""
+    def __init__(self, *arg, **kwarg):
+        super().__init__(*arg, **kwarg)
+        self.apply_styled_widgets()

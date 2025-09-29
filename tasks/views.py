@@ -17,7 +17,7 @@ def test(request) :
     return render(request, "test.html")
 
 def task_create(request) :
-    employees = Employee.objects.all()
+    # employees = Employee.objects.all()
     form = TaskModelForm () # get method
 
     # POST form 
@@ -26,7 +26,7 @@ def task_create(request) :
         if form.is_valid() :
             # --For Django ModelForm--
             form.save()
-
+            return render(request, "task.html",{"form" : form, "message" : "task added successfully!"})
             # --for Django Form Data---
             # data = form.cleaned_data
             # title = data.get("title")
