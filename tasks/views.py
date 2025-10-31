@@ -13,17 +13,28 @@ def managerDashboard(request) :
     tasks = Task.objects.select_related("details").prefetch_related("assigned_to").all()
 
     #geting Task Count
-    total_task = tasks.count()
-    completed_task = Task.objects.filter(status = "COMPLETED").count()
-    in_progress_task = Task.objects.filter(status = "INPROGRESS").count()
-    pending_task = Task.objects.filter(status = "PENDING").count()
+    # total_task = tasks.count()
+    # completed_task = Task.objects.filter(status = "COMPLETED").count()
+    # in_progress_task = Task.objects.filter(status = "INPROGRESS").count()
+    # pending_task = Task.objects.filter(status = "PENDING").count()
+
+    # count = {
+    #     "total_task" : 
+    #     "completed_task" :
+    #     "in_progress_task" :
+    #     "pending_task" :
+    # }
+
+    counts = Task.objects.aggregate(
+        total = Count("id"),
+        completed = Count("id", filter=Q(status = "COMPLETED")),
+        in_progress = Count("id", filter=Q(status = "INPROGRESS")),
+        pending_task = Count("id", filter=Q(status = "PENDING"))
+    )
 
     context = {
         "tasks" : tasks,
-        "total_task" : total_task,
-        "completed_task" : completed_task,
-        "pending_task" : pending_task,
-        "in_progress_task" : in_progress_task
+        "counts" : counts,
     }
 
     return render(request, "dashboard/manager-dashboard.html",context)
