@@ -1,16 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from tasks.forms import TaskForm, TaskModelForm
+from tasks.forms import TaskForm, TaskModelForm, TaskDetailsForm
 from tasks.models import Employee, Task, TaskDetails, Project
 from datetime import date, timedelta
 from django.db.models import Q,Count, Max, Min, Avg
+from django.contrib import messages
 
 # Create your views here.
 def dashboard(request) :
     return render(request, "dashboard/dashboard.html")
 
 def managerDashboard(request) :
-    tasks = Task.objects.select_related("details").prefetch_related("assigned_to").all()
+    type = request.GET.get("type", "all")
+    # print(type)
 
     #geting Task Count
     # total_task = tasks.count()
@@ -32,6 +34,18 @@ def managerDashboard(request) :
         pending_task = Count("id", filter=Q(status = "PENDING"))
     )
 
+    # retrieve task Data
+    base_query = Task.objects.select_related("details")
+
+    if type == "completed" :
+        tasks = base_query.filter(status = "COMPLETED")
+    elif type == "in-progress" :
+        tasks = base_query.filter(status = "INPROGRESS")
+    elif type == "pending" :
+        tasks = base_query.filter(status = "PENDING")
+    elif type == "all" :
+        tasks = base_query.all()
+
     context = {
         "tasks" : tasks,
         "counts" : counts,
@@ -47,17 +61,27 @@ def test(request) :
 
 def task_create(request) :
     # employees = Employee.objects.all()
-    form = TaskModelForm () # get method
+    task_form = TaskModelForm () # get method
+    task_details_form = TaskDetailsForm()
 
     # POST form 
     if request.method == "POST" :
-        form = TaskModelForm(request.POST)
-        if form.is_valid() :
+        task_form = TaskModelForm (request.POST)
+        task_details_form = TaskDetailsForm(request.POST)
+        if task_form.is_valid() and task_details_form.is_valid() :
             # --For Django ModelForm--
-            form.save()
-            return render(request, "task.html",{"form" : form, "message" : "task added successfully!"})
+            task = task_form.save()
+            task_detail = task_details_form.save(commit=False)
+            task_detail.task = task
+            task_detail.save()
+            
+            messages.success(request,"Task Created Successfully")
+            return redirect("task-create")
 
-    context = {"form" : form}
+    context = {
+        "task_form" : task_form,
+        "task_details_form" : task_details_form
+        }
     return render(request, "task.html" , context)
 
 def show_task(request) : 

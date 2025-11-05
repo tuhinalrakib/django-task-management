@@ -1,5 +1,5 @@
 from django import forms
-from tasks.models import Task
+from tasks.models import Task,TaskDetails
 
 # Django Form
 class TaskForm (forms.Form) :
@@ -43,13 +43,22 @@ class styledFormMixin :
 class TaskModelForm (styledFormMixin,forms.ModelForm) :
     class Meta :
         model = Task
-        fields = ['title','description','due_date','assigned_to']
+        fields = ['title','description','due_date']
         widgets = {
             "due_date" : forms.SelectDateWidget,
             "assigned_to" : forms.CheckboxSelectMultiple
         }
 
     """Widgets using Mixins"""
+    def __init__(self, *arg, **kwarg):
+        super().__init__(*arg, **kwarg)
+        self.apply_styled_widgets()
+
+class TaskDetailsForm(styledFormMixin,forms.ModelForm) :
+    class Meta:
+        model = TaskDetails
+        fields = ["priority", "notes"]
+
     def __init__(self, *arg, **kwarg):
         super().__init__(*arg, **kwarg)
         self.apply_styled_widgets()

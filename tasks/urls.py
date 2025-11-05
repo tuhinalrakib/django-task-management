@@ -3,9 +3,9 @@ from tasks.views import dashboard, managerDashboard, userDashboard, test, task_c
 
 urlpatterns = [
     path("dashboard/", dashboard),
-    path("manager-dashboard/", managerDashboard),
+    path("manager-dashboard/", managerDashboard, name="manager"),
     path("user-dashboard/", userDashboard),
     path("test/", test),
-    path("task-create/", task_create),
+    path("task-create/", task_create, name="task-create"),
     path("show-task/", show_task)
 ]
