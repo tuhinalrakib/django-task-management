@@ -18,7 +18,11 @@
           <div class="w-2 h-2 bg-green-500 rounded-full"></div>
           <div>
             <span>{{task.title}}</span>
-            {% comment %} <span>{{task.status}}</span> {% endcomment %}
+            <a href="{% url 'update-task' task.id %}" class="px-3 py-1 bg-blue-300">Edit</a>
+            <form action="{% url 'delete-task' task.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="px-3 py-1 bg-blue-300">Delete</button>
+            </form>
           </div>
         </div>
         <div>

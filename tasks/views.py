@@ -84,6 +84,43 @@ def task_create(request) :
         }
     return render(request, "task.html" , context)
 
+def update_task(request, id) :
+    task = Task.objects.get(id = id)
+    task_form = TaskModelForm (instance=task) 
+    if task.details :
+        task_details_form = TaskDetailsForm(instance=task.details)
+        
+
+    # POST form 
+    if request.method == "POST" :
+        task_form = TaskModelForm (request.POST, instance = task)
+        task_details_form = TaskDetailsForm(request.POST, instance=task.details)
+        if task_form.is_valid() and task_details_form.is_valid() :
+            # --For Django ModelForm--
+            task = task_form.save()
+            task_detail = task_details_form.save(commit=False)
+            task_detail.task = task
+            task_detail.save()
+            
+            messages.success(request,"Task Update Successfully")
+            return redirect("task-create")
+
+    context = {
+        "task_form" : task_form,
+        "task_details_form" : task_details_form
+        }
+    return render(request, "task.html" , context)
+
+def delete_task(request, id) : 
+    if request.method == "POST" :
+        task = Task.objects.get(id=id)
+        task.delete()
+        messages.success(request,"Task Deleted Successfully")
+        return redirect("manager")
+    else :
+        messages.success(request, "Success")
+        return redirect("manager")
+
 def show_task(request) : 
     today = date.today()
     one_week_ago = today - timedelta(days=7)
