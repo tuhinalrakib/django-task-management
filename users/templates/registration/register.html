@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen max-w-3xl mx-auto my-5">
+        <h1>Wellcome To Users Authentication</h1>
+        <form action="" method="POST">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    {{error}}
+                {% endfor %}
+            {% endif %}
+            {% for field in form %}
+                <p class="mx-5 flex flex-col border-2">
+                    <label for="{{field.id_for_label}}">{{field.label}}</label>
+                    {{field}}
+                    {% if field.errors %}
+                    <ul>
+                        {% for error in field.errors %}
+                            <li>{{error}}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <button type="submit" class="py-2 px-5 rounded-xl bg-blue-500 shadow-md">Sign Up</button>
+        </form>
+    </div>
+{% endblock content %}

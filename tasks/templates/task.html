@@ -1,28 +1,19 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href={% static "css/output.css" %}>
-</head>
-<body>
-    <div class="w-1/2 mx-auto mt-10">
-        <div>
+{% extends "base.html" %}
+{% block content %}
+<div class="w-1/2 mx-auto my-10">
+    <div>
         {% if message %}
             {% for message in message %}
                 <div class="p-2 {% if message.tags == 'success' %}bg-green-600{% endif %}">{{message}}</div>
             {% endfor %}
         {% endif %}
     </div>
-    <form method="POST">
-        <input type="text" class="border border-gray-500 w-full rounded-lg shadow-sm focus:border-gray-200">
+    <form method="POST" enctype='multipart/form-data'>
+        
         {% csrf_token %}
         {{ task_form }}
         {{ task_details_form }}
         <button type="submit" class="py-2 px-5 rounded-xl bg-blue-600 text-white">Submit</button>
     </form>
-    </div>
-</body>
-</html>
+</div>
+{% endblock content %}

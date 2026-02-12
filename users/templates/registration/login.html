@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-5 min-h-screen my-5 max-w-3xl mx-auto">
+        <h1>Wellcome To Users Authentication</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div
+                    class="px-2 py-1 {% if message.tags == 'success' %}bg-green-600{% endif %}"
+                >
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                    {{error}}
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            {{form}}
+            <button type="submit" class="py-2 px-5 rounded-xl bg-blue-500 shadow-md">Sign In</button>
+        </form>
+    </div>
+{% endblock content %}

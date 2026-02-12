@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Project(models.Model) :
@@ -8,7 +9,7 @@ class Project(models.Model) :
 
     def __str__(self):
         return self.name
-
+    
 class Task(models.Model) :
     STATUS_CHOICES = [
         ("PENDING", "Pending"),
@@ -21,12 +22,12 @@ class Task(models.Model) :
         related_name= "project_tasks",
         default=1
         )
-    # assigned_to = models.ManyToManyField("Employee",related_name= "tasks")
+    assigned_to = models.ManyToManyField(User, related_name="tasks")
     title = models.CharField(max_length=250)
     description = models.TextField()
     due_date = models.DateField()
     status = models.CharField(max_length=15,choices=STATUS_CHOICES, default="PENDING")
-    is_completed = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now= True)
 
@@ -45,9 +46,10 @@ class TaskDetails(models.Model) :
     )
     task = models.OneToOneField(
         Task, 
-        on_delete= models.CASCADE,
+        on_delete= models.DO_NOTHING,
         related_name= "details"
         )
+    asset = models.ImageField(upload_to="task_assets", blank=True,  default="task_assets/default.jpg")
     assigned_to = models.CharField(max_length=100)
     priority = models.CharField(max_length=1, choices= PRIORITY_OPTIONS, default= LOW)
     notes = models.TextField(blank=True, null=True)
@@ -55,13 +57,9 @@ class TaskDetails(models.Model) :
     def __str__(self):
         return f"Detail from task {self.task.title}"
 
-class Employee(models.Model) : 
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-
-    def __str__(self):
-        return self.name
-
 # Many To Many realation
 # task = onekgulo empoyee ekta task korse
 # employee = onekgulo task er jonn employee assign ase
+
+#signals
+ 

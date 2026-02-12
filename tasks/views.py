@@ -1,31 +1,24 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from tasks.forms import TaskForm, TaskModelForm, TaskDetailsForm
-from tasks.models import Employee, Task, TaskDetails, Project
+from tasks.models import Task, TaskDetails, Project
 from datetime import date, timedelta
 from django.db.models import Q,Count, Max, Min, Avg
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test, login_required, permission_required
+from users.views import is_admin
 
 # Create your views here.
-def dashboard(request) :
-    return render(request, "dashboard/dashboard.html")
 
+def is_manager(user):
+    return user.groups.filter(name="Manager").exists()
+
+def is_user(user):
+    return user.groups.filter(name="User").exists()
+
+# @user_passes_test(is_manager, login_url="no-permission")
 def managerDashboard(request) :
     type = request.GET.get("type", "all")
-    # print(type)
-
-    #geting Task Count
-    # total_task = tasks.count()
-    # completed_task = Task.objects.filter(status = "COMPLETED").count()
-    # in_progress_task = Task.objects.filter(status = "INPROGRESS").count()
-    # pending_task = Task.objects.filter(status = "PENDING").count()
-
-    # count = {
-    #     "total_task" : 
-    #     "completed_task" :
-    #     "in_progress_task" :
-    #     "pending_task" :
-    # }
 
     counts = Task.objects.aggregate(
         total = Count("id"),
@@ -53,21 +46,23 @@ def managerDashboard(request) :
 
     return render(request, "dashboard/manager-dashboard.html",context)
 
-def userDashboard(request) :
+# @user_passes_test(is_employee, login_url="no-permission")
+def employeeDashboard(request) :
     return render(request, "dashboard/user-dashboard.html")
 
 def test(request) :
     return render(request, "test.html")
 
+# @login_required
+# @permission_required("tasks.add_task", login_url="no-permission")
 def task_create(request) :
-    # employees = Employee.objects.all()
     task_form = TaskModelForm () # get method
     task_details_form = TaskDetailsForm()
 
     # POST form 
     if request.method == "POST" :
         task_form = TaskModelForm (request.POST)
-        task_details_form = TaskDetailsForm(request.POST)
+        task_details_form = TaskDetailsForm(request.POST, request.FILES)
         if task_form.is_valid() and task_details_form.is_valid() :
             # --For Django ModelForm--
             task = task_form.save()
@@ -84,6 +79,8 @@ def task_create(request) :
         }
     return render(request, "task.html" , context)
 
+# @login_required
+# @permission_required("tasks.change_task", login_url="no-permission")
 def update_task(request, id) :
     task = Task.objects.get(id = id)
     task_form = TaskModelForm (instance=task) 
@@ -111,6 +108,8 @@ def update_task(request, id) :
         }
     return render(request, "task.html" , context)
 
+# @login_required
+# @permission_required("tasks.delete_task", login_url="no-permission")
 def delete_task(request, id) : 
     if request.method == "POST" :
         task = Task.objects.get(id=id)
@@ -130,3 +129,28 @@ def show_task(request) :
                   {
                     "tasks" : tasks
                 })
+
+def task_details(request, id):
+    task = Task.objects.get(id=id)
+    status_choices = Task.STATUS_CHOICES
+    
+    if request.method == "POST":
+        selected_status = request.POST.get("task_status")
+        print(selected_status)
+        task.status = selected_status
+        task.save()
+        return redirect("task-details", task.id)
+        
+    return render(request, "task_details.html", {
+        "task": task,
+        "status_choices" : status_choices
+        })
+
+@login_required
+def dashboard(request):
+    if is_manager(request.user):
+        return redirect("manager-dashboard")
+    elif is_user(request.user):
+        return redirect("user-dashboard")
+    elif is_admin(request.user):
+        return redirect("manager-dashboard")
