@@ -4,7 +4,7 @@
       <!-- Task Card -->
       <div class="w-[90%] mt-10 mx-auto grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <!-- Total Task -->
-         <a href="{% url "manager" %}?type=all">
+         <a href='{% url "manager-dashboard" %}?type=all'>
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-gray-500 text-sm font-medium mb-4 uppercase">
             Total Task
@@ -35,7 +35,7 @@
         </div>
         </a>
         <!-- Completed Task -->
-         <a href="{% url "manager" %}?type=completed">
+         <a href='{% url "manager-dashboard" %}?type=completed'>
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-gray-500 text-sm font-medium mb-4 uppercase">
             Completed Task
@@ -66,7 +66,7 @@
         </div>
         </a>
         <!-- Task in Prgress -->
-         <a href="{% url "manager" %}?type=in-progress">
+         <a href='{% url "manager-dashboard" %}?type=in-progress'>
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-gray-500 text-sm font-medium mb-4 uppercase">
             Task in Progress
@@ -96,7 +96,7 @@
         </div>
         </a>
         <!-- TODOS -->
-        <a href="{% url "manager" %}?type=pending">
+        <a href='{% url "manager-dashboard" %}?type=pending'>
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-gray-500 text-sm font-medium mb-4">Todos</h3>
           <div class="flex justify-between items-start">

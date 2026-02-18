@@ -26,7 +26,7 @@ def sign_up(request):
             user.is_active = False
             user.save()
             messages.success(request, "A confirmation mail sent. Please check your email")
-            return redirect('sign-in')
+            return redirect('login')
         else:
             print("Password are not same")
     return render(request, "registration/register.html", {
